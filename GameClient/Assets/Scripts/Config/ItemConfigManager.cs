@@ -1,14 +1,18 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using LitJson;
 
-public class ItemConfigManager{
+public class ItemConfigManager
+{
 
-    public List<ItemConfig> cfgList;
+    private string sourceName = "item";
+
+    public Dictionary<int,ItemConfig> cfgDic;
 
     public ItemConfigManager()
     {
-        cfgList = new List<ItemConfig>();
+        cfgDic = new Dictionary<int, ItemConfig>();
     }
 
     private static ItemConfigManager _instance;
@@ -20,12 +24,21 @@ public class ItemConfigManager{
         return _instance;
     }
 
-    public void setup(Object obj)
+    public void setup()
     {
-        ItemConfig cfhInfo;
-        foreach (object cfg in obj)
+        ItemConfig cfgInfo;
+        JsonData jd = ParseJsonUtil.Instance().ParseJsonToData(sourceName);
+        for (int i = 0; i < jd.Count; i++)
         {
-
+            cfgInfo = JsonMapper.ToObject<ItemConfig>(jd[i].ToJson());
+            cfgDic.Add(cfgInfo.itemId,cfgInfo);
         }
+    }
+
+    public ItemConfig getCfgById(int id)
+    {
+        if (cfgDic.ContainsKey(id))
+            return cfgDic[id];
+        return null;
     }
 }
